@@ -4,9 +4,9 @@ project(LEDMatrix)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(SOURCES src/LEDMatrix.cpp)
+set(SOURCES LEDMatrix.cpp)
 
-set(HEADERS src/LEDMatrix.h)
+set(HEADERS LEDMatrix.h)
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
