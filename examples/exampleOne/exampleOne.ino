@@ -1,12 +1,18 @@
-#include <LEDMatrix.h>
+// #include <Arduino.h>
+
+#include "LEDMatrix.h"
 
 #define NUM_PER_ROW 15
 #define NUM_ROW 10
-#define PIN 5
+#define PIN 16
 
 LEDMatrix matrix(NUM_PER_ROW, NUM_ROW, PIN);
 
 void setup() {
+  Serial.begin(115200);
+  // uint16_t board_id = boardID();
+  // Serial.print("Board ID: ");
+  // Serial.println(board_id);
   matrix.begin();
 }
 

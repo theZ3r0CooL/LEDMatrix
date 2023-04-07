@@ -1,6 +1,7 @@
-#ifndef LEDMATRIX_H
-#define LEDMATRIX_H
+#ifndef LEDMatrix_H
+#define LEDMatrix_H
 
+#include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 
 class LEDMatrix {
@@ -15,6 +16,8 @@ class LEDMatrix {
     void drawPattern(uint32_t* pattern, uint16_t patternLength, uint16_t speed);
   private:
     Adafruit_NeoPixel strip;
+    // find_arduino_library(strip Adafruit_NeoPixel ${board_id} 3RD_PARTY);
+    // link_arduino_library(my_target strip, ${board_id});
     uint16_t numPerRow;
     uint8_t numRow;
     uint16_t numPixels;
@@ -24,4 +27,4 @@ class LEDMatrix {
     void setPixelColorBuffer(uint16_t x, uint16_t y, uint32_t color);
 };
 
-#endif  // LEDMATRIX_H
+#endif
