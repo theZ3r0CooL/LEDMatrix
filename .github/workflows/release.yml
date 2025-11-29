@@ -23,12 +23,24 @@ jobs:
           arduino-cli core install esp32:esp32
           arduino-cli lib install "Adafruit NeoPixel"
 
+      - name: Install LEDMatrix library
+        run: |
+          # Get Arduino libraries directory
+          ARDUINO_LIB_DIR=$(arduino-cli config get directories.user)/libraries
+          mkdir -p "$ARDUINO_LIB_DIR/LEDMatrix"
+          
+          # Copy library files using proper Arduino library structure
+          cp -r src "$ARDUINO_LIB_DIR/LEDMatrix/"
+          cp library.properties "$ARDUINO_LIB_DIR/LEDMatrix/"
+          cp keywords.txt "$ARDUINO_LIB_DIR/LEDMatrix/"
+          [ -d examples ] && cp -r examples "$ARDUINO_LIB_DIR/LEDMatrix/"
+
       - name: Verify library compiles
         run: |
-          # Create a test sketch that includes the library
+          # Create a test sketch that uses the library
           mkdir -p /tmp/test_sketch
           cat > /tmp/test_sketch/test_sketch.ino << 'EOF'
-          #include "LEDMatrix.h"
+          #include <LEDMatrix.h>
 
           LEDMatrix matrix(15, 10, 5);
 
@@ -43,10 +55,6 @@ jobs:
           }
           EOF
 
-          # Copy library files to the sketch directory for compilation
-          cp src/LEDMatrix.h /tmp/test_sketch/
-          cp src/LEDMatrix.cpp /tmp/test_sketch/
-
           # Compile the test sketch for ESP32
           arduino-cli compile --fqbn esp32:esp32:esp32 /tmp/test_sketch
 
@@ -57,7 +65,14 @@ jobs:
       - name: Create library ZIP
         run: |
           mkdir -p LEDMatrix
-          cp -r src examples library.properties keywords.txt README.md LICENSE LEDMatrix/
+          # Copy required files
+          cp -r src LEDMatrix/
+          cp library.properties LEDMatrix/
+          # Copy optional files if they exist
+          [ -d examples ] && cp -r examples LEDMatrix/
+          [ -f keywords.txt ] && cp keywords.txt LEDMatrix/
+          [ -f README.md ] && cp README.md LEDMatrix/
+          [ -f LICENSE ] && cp LICENSE LEDMatrix/
           zip -r LEDMatrix-${{ steps.get_version.outputs.VERSION }}.zip LEDMatrix
 
       - name: Create GitHub Release
