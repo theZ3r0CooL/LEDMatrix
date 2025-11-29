@@ -1,37 +1,56 @@
-name: Build and Release Library
+name: Build and Verify Arduino Library
+
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.3.0
-      - name: Build Library
+        uses: actions/checkout@v4
+
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Install Arduino core and libraries
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          make
-      - name: Create Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          body: |
-            Release of version ${{ env.VERSION }}
-          draft: false
-          prerelease: false
-      - name: Upload Build
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/libLEDMatrix.a
-          asset_name: libLEDMatrix.a
-          asset_content_type: application/octet-stream
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
+          arduino-cli lib install "Adafruit NeoPixel"
+
+      - name: Verify library compiles with example
+        run: |
+          # Create a test sketch that includes the library
+          mkdir -p /tmp/test_sketch
+          cat > /tmp/test_sketch/test_sketch.ino << 'EOF'
+          #include "LEDMatrix.h"
+
+          LEDMatrix matrix(15, 10, 5);
+
+          void setup() {
+            matrix.begin();
+            matrix.setBrightness(50);
+          }
+
+          void loop() {
+            matrix.fill(matrix.Color(255, 0, 0));
+            matrix.show();
+            delay(1000);
+            matrix.clear();
+            matrix.show();
+            delay(1000);
+          }
+          EOF
+
+          # Copy library files to the sketch directory for compilation
+          cp src/LEDMatrix.h /tmp/test_sketch/
+          cp src/LEDMatrix.cpp /tmp/test_sketch/
+
+          # Compile the test sketch for ESP32
+          arduino-cli compile --fqbn esp32:esp32:esp32 /tmp/test_sketch
