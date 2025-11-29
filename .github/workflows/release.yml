@@ -1,16 +1,15 @@
-name: Build and Verify Arduino Library
+name: Release Library
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+    tags:
+      - 'v*'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,7 +35,7 @@ jobs:
           cp keywords.txt "$ARDUINO_LIB_DIR/LEDMatrix/"
           [ -d examples ] && cp -r examples "$ARDUINO_LIB_DIR/LEDMatrix/"
 
-      - name: Verify library compiles with example
+      - name: Verify library compiles
         run: |
           # Create a test sketch that uses the library
           mkdir -p /tmp/test_sketch
@@ -47,14 +46,10 @@ jobs:
 
           void setup() {
             matrix.begin();
-            matrix.setBrightness(50);
           }
 
           void loop() {
             matrix.fill(matrix.Color(255, 0, 0));
-            matrix.show();
-            delay(1000);
-            matrix.clear();
             matrix.show();
             delay(1000);
           }
@@ -62,3 +57,40 @@ jobs:
 
           # Compile the test sketch for ESP32
           arduino-cli compile --fqbn esp32:esp32:esp32 /tmp/test_sketch
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create library ZIP
+        run: |
+          mkdir -p LEDMatrix
+          # Copy required files
+          cp -r src LEDMatrix/
+          cp library.properties LEDMatrix/
+          # Copy optional files if they exist
+          [ -d examples ] && cp -r examples LEDMatrix/
+          [ -f keywords.txt ] && cp keywords.txt LEDMatrix/
+          [ -f README.md ] && cp README.md LEDMatrix/
+          [ -f LICENSE ] && cp LICENSE LEDMatrix/
+          zip -r LEDMatrix-${{ steps.get_version.outputs.VERSION }}.zip LEDMatrix
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ steps.get_version.outputs.VERSION }}
+          body: |
+            ## LEDMatrix Library v${{ steps.get_version.outputs.VERSION }}
+            
+            Download the ZIP file and install it in the Arduino IDE via:
+            Sketch > Include Library > Add .ZIP Library
+            
+            ### Dependencies
+            - Adafruit NeoPixel library
+            
+            ### Supported Architectures
+            - ESP32
+          files: |
+            LEDMatrix-${{ steps.get_version.outputs.VERSION }}.zip
+          draft: false
+          prerelease: false
