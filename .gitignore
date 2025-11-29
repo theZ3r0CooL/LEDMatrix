@@ -33,3 +33,4 @@
 
 # Other
 .DS_Store
+build/
