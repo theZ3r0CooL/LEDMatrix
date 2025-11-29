@@ -21,6 +21,9 @@ void LEDMatrix::setPixelColor(uint16_t x, uint16_t y, uint32_t color) {
 }
 
 uint32_t LEDMatrix::getPixelColor(uint16_t x, uint16_t y) {
+  if (x >= numPerRow || y >= numRow) {
+    return 0;
+  }
   return buffer[y * numPerRow + x];
 }
 
