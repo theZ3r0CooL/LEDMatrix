@@ -1,2 +1,0 @@
-/usr/bin/ar qc libLEDMatrix.a CMakeFiles/LEDMatrix.dir/src/LEDMatrix.cpp.o
-/usr/bin/ranlib libLEDMatrix.a
