@@ -20,6 +20,13 @@ void LEDMatrix::setPixelColor(uint16_t x, uint16_t y, uint32_t color) {
   strip.setPixelColor(y * numPerRow + x, color);
 }
 
+uint32_t LEDMatrix::getPixelColor(uint16_t x, uint16_t y) {
+  if (x >= numPerRow || y >= numRow) {
+    return 0;
+  }
+  return buffer[y * numPerRow + x];
+}
+
 void LEDMatrix::fill(uint32_t color) {
   for (uint16_t i = 0; i < bufferLength; i++) {
     buffer[i] = color;
@@ -36,6 +43,26 @@ void LEDMatrix::show() {
     strip.setPixelColor(i, buffer[i]);
   }
   strip.show();
+}
+
+void LEDMatrix::setBrightness(uint8_t brightness) {
+  strip.setBrightness(brightness);
+}
+
+uint8_t LEDMatrix::getRows() {
+  return numRow;
+}
+
+uint16_t LEDMatrix::getColumns() {
+  return numPerRow;
+}
+
+uint16_t LEDMatrix::getNumPixels() {
+  return numPixels;
+}
+
+uint32_t LEDMatrix::Color(uint8_t r, uint8_t g, uint8_t b) {
+  return Adafruit_NeoPixel::Color(r, g, b);
 }
 
 void LEDMatrix::scrollText(String text, uint32_t color, uint16_t speed) {

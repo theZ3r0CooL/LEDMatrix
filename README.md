@@ -57,9 +57,15 @@ void loop() {
 - `LEDMatrix(uint16_t numPerRow, uint8_t numRow, uint8_t pin)`: Constructor that initializes the `strip` object from the `Adafruit_NeoPixel` library with the total number of LEDs in the matrix.
 - `void begin()`: Initializes the `strip` object.
 - `void setPixelColor(uint16_t x, uint16_t y, uint32_t color)`: Sets the color of the LED at position `(x, y)` in the matrix.
+- `uint32_t getPixelColor(uint16_t x, uint16_t y)`: Gets the color of the LED at position `(x, y)` in the matrix. Returns 0 if coordinates are out of bounds.
 - `void fill(uint32_t color)`: Fills the entire matrix with the specified color.
 - `void clear()`: Clears the entire matrix.
 - `void show()`: Updates the LEDs in the matrix to match the values in the `buffer` array.
+- `void setBrightness(uint8_t brightness)`: Sets the brightness of the entire matrix (0-255).
+- `uint8_t getRows()`: Returns the number of rows in the matrix.
+- `uint16_t getColumns()`: Returns the number of columns (LEDs per row) in the matrix.
+- `uint16_t getNumPixels()`: Returns the total pixel count as defined by the user-provided parameters (numPerRow × numRow).
+- `static uint32_t Color(uint8_t r, uint8_t g, uint8_t b)`: Creates a 32-bit color value from RGB components.
 - `void scrollText(String text, uint32_t color, uint16_t speed)`: Scrolls the specified text across the matrix at the specified speed and color.
 - `void drawPattern(uint32_t* pattern, uint16_t patternLength, uint16_t speed)`: Displays a scrolling pattern of colors on the matrix.
 

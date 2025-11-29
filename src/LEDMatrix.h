@@ -9,9 +9,15 @@ class LEDMatrix {
     LEDMatrix(uint16_t numPerRow, uint8_t numRow, uint8_t pin);
     void begin();
     void setPixelColor(uint16_t x, uint16_t y, uint32_t color);
+    uint32_t getPixelColor(uint16_t x, uint16_t y);
     void fill(uint32_t color);
     void clear();
     void show();
+    void setBrightness(uint8_t brightness);
+    uint8_t getRows();
+    uint16_t getColumns();
+    uint16_t getNumPixels();
+    static uint32_t Color(uint8_t r, uint8_t g, uint8_t b);
     void scrollText(String text, uint32_t color, uint16_t speed);
     void drawPattern(uint32_t* pattern, uint16_t patternLength, uint16_t speed);
   private:

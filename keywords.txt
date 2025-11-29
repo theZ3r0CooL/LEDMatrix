@@ -13,8 +13,14 @@ numRow
 pin
 begin
 setPixelColor
+getPixelColor
 fill
 clear
 show
+setBrightness
+getRows
+getColumns
+getNumPixels
+Color
 scrollText
 drawPattern
